@@ -1,0 +1,4 @@
+.github/workflows/aws.yml
+docs
+docs_SQL
+env_generative_ai

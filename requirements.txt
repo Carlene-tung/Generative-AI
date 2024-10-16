@@ -1,0 +1,8 @@
+langchain
+openai
+langchain-community
+yt_dlp
+pydub
+chromadb
+pypdf
+tiktoken

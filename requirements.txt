@@ -6,3 +6,4 @@ pydub
 chromadb
 pypdf
 tiktoken
+streamlit

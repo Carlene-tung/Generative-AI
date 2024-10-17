@@ -17,43 +17,33 @@ on:
     branches:
     - main
 
-# This pipeline consists of two jobs named ci_pipeline and cd_pipeline
-
 jobs:
   ci_pipeline: 
-    runs-on: ubuntu-latest # The job runs on the ubuntu-latest operating system
+    runs-on: ubuntu-latest 
 
     steps:
       - uses: actions/checkout@v1 
         with:
           fetch-depth: 0
-      # The first step uses the actions/checkout@v1 action to clone the repository.
-      # The fetch-depth: 0 parameter ensures that the complete commit history is fetched.
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v1
         with:
           python-version: 3.9
-      # The second step sets up Python 3.9 by using the actions/setup-python@v1 action.
-      # The python-version: 3.9 parameter specifies the desired Python version.
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install black
+          pip install black pylint  # Ensure black and pylint are installed
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      # The third step installs the project dependencies, including black.
 
       - name: Format
         run: |
           black app.py
-      # The fourth step formats the app.py file using the black code formatter.
 
       - name: Lint
         run: |
           pylint --disable=R,C app.py
-      # The fifth step performs linting on the app.py file using pylint.
-      # The --disable=R,C flag disables specific pylint checks.
 
   cd_pipeline:
     runs-on: ubuntu-latest
@@ -64,19 +54,15 @@ jobs:
       - name: docker login
         run: |
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-      # Logs into Docker Hub account
 
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d--%H-%M-%S')"
-      # Gets the date of the build
 
       - name: Build the Docker image
         run: |
           docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:${{ steps.date.outputs.date }}
-      # Builds the Docker image and tags it with the current date
 
       - name: Docker Push
         run: |
           docker push $DOCKER_USER/$REPO_NAME:${{ steps.date.outputs.date }}
-      # Pushes the image to Docker Hub
